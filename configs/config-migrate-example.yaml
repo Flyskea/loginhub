@@ -1,0 +1,4 @@
+database:
+  driver: mysql
+  source: ""
+dir: "./migration"

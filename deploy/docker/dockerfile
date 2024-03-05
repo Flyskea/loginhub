@@ -1,0 +1,33 @@
+FROM golang:alpine AS builder
+
+ARG FLAGS
+
+WORKDIR /app
+
+COPY go.mod .
+COPY go.sum .
+
+RUN export GO111MODULE=on && \
+    export GOPROXY=https://goproxy.cn && \
+    go mod download
+
+COPY . .
+
+RUN go build -ldflags "$FLAGS" -o ./server ./cmd/server
+
+FROM alpine
+
+WORKDIR /
+
+COPY --from=builder /app/server /app/server 
+COPY configs /conf
+COPY static /static
+
+RUN mv /conf/config-example.yaml /conf/config.yaml && \
+    mv /conf/config-migrate-example.yaml /conf/config-migrate.yaml
+
+EXPOSE 9000
+
+RUN ls -la /
+
+CMD ["/app/server" ,"-c","/conf/config.yaml"]

@@ -1,0 +1,90 @@
+syntax = "proto3";
+package blog.internal.conf;
+
+option go_package = "github.com/go-kratos/examples/blog/internal/conf;conf";
+
+import "google/protobuf/duration.proto";
+
+message Bootstrap {
+    Server server = 1;
+    Data data = 2;
+    Trace trace = 3;
+    Passport passport = 4;
+    SMTP smtp = 5;
+    Captcha captcha = 6;
+    Log log = 7;
+    IP2Region ip2region = 8;
+}
+
+message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+}
+
+message Server {
+    HTTP http = 1;
+}
+
+message Database {
+    string driver = 1;
+    string source = 2;
+}
+
+message Redis {
+    string addr = 1;
+    string password = 2;
+    google.protobuf.Duration read_timeout = 3;
+    google.protobuf.Duration write_timeout = 4;
+}
+
+message Data {
+    Database database = 1;
+    Redis redis = 2;
+}
+
+message Trace {
+    string endpoint = 1;
+}
+
+message Passport {
+    google.protobuf.Duration access_token_ttl = 1;
+    google.protobuf.Duration refresh_token_ttl = 2;
+    string secret = 3;
+    google.protobuf.Duration device_cache_ttl = 4;
+}
+
+message SMTP {
+    string host = 1;
+    int32 port = 2;
+    string user_name = 3;
+    string password = 4;
+    string from_name = 5;
+}
+
+message Captcha {
+    google.protobuf.Duration ttl = 1;
+    google.protobuf.Duration interval = 2;
+}
+
+enum Level {
+    INFO = 0;
+    WARN = 1;
+    ERROR = 2;
+    DEBUG = 3;
+}
+
+message Log {
+    bool console = 1;
+    Level level = 2;
+    bool caller = 3;
+}
+
+message IP2Region {
+    string path = 1;
+}
+
+message Migrate {
+    Database database = 1;
+    string dir = 2;
+}

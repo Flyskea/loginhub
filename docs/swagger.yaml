@@ -1,0 +1,531 @@
+basePath: /api/v1
+definitions:
+  handler.RespBody:
+    properties:
+      code:
+        description: http code
+        type: integer
+      data:
+        description: response data
+      msg:
+        description: response message
+        type: string
+      reason:
+        description: reason key
+        type: string
+    type: object
+  passport.CreateOauth2ProviderRequest:
+    properties:
+      client_id:
+        type: string
+      client_secret:
+        type: string
+      provider:
+        type: string
+      redirect_url:
+        type: string
+    required:
+    - client_id
+    - client_secret
+    - provider
+    - redirect_url
+    type: object
+  passport.Device:
+    properties:
+      browser:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      ip:
+        type: string
+      location:
+        type: string
+      os:
+        type: string
+    type: object
+  passport.EmailSendRequest:
+    properties:
+      email:
+        type: string
+      type:
+        type: integer
+    required:
+    - email
+    - type
+    type: object
+  passport.GetOauthRedirectURLResponse:
+    properties:
+      redirect_url:
+        type: string
+    type: object
+  passport.LoginDevice:
+    properties:
+      devices:
+        items:
+          $ref: '#/definitions/passport.Device'
+        type: array
+    type: object
+  passport.LoginRequest:
+    properties:
+      code:
+        type: string
+      email:
+        type: string
+      login_type:
+        minimum: 1
+        type: integer
+      password:
+        type: string
+      phone:
+        type: string
+      provider:
+        type: string
+      state:
+        type: string
+    required:
+    - login_type
+    type: object
+  passport.LoginResponse:
+    properties:
+      refresh_token:
+        type: string
+      user:
+        $ref: '#/definitions/passport.User'
+    type: object
+  passport.RegisterRequest:
+    properties:
+      capcha:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      password_confirm:
+        type: string
+      register_type:
+        minimum: 1
+        type: integer
+      user_name:
+        type: string
+    required:
+    - capcha
+    - password
+    - password_confirm
+    - register_type
+    - user_name
+    type: object
+  passport.RegisterResponse:
+    properties:
+      refresh_token:
+        type: string
+      user:
+        $ref: '#/definitions/passport.User'
+    type: object
+  passport.SessionRefreshRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  passport.SessionRefreshResponse:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  passport.UpdateOauth2ProviderRequest:
+    properties:
+      client_id:
+        type: string
+      client_secret:
+        type: string
+      redirect_url:
+        type: string
+    required:
+    - client_id
+    - client_secret
+    - redirect_url
+    type: object
+  passport.User:
+    properties:
+      avatar:
+        type: string
+      name:
+        type: string
+      uid:
+        type: integer
+    type: object
+info:
+  contact: {}
+  description: This is a auth server
+  title: LoginHub API
+  version: v1
+paths:
+  /passport/device:
+    get:
+      consumes:
+      - application/json
+      description: 获取用户登录的设备列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.RespBody'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/passport.LoginDevice'
+                  type: array
+              type: object
+        "400":
+          description: 参数有误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+      summary: 用户登录设备
+      tags:
+      - Passport
+  /passport/device/{id}/kick:
+    post:
+      consumes:
+      - application/json
+      description: 用户注销设备
+      parameters:
+      - description: 设备ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求成功
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "400":
+          description: 参数有误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+      summary: 用户注销设备
+      tags:
+      - Passport
+  /passport/login:
+    post:
+      consumes:
+      - application/json
+      description: 根据类型用户登录
+      parameters:
+      - description: 用户登录请求
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/passport.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.RespBody'
+            - properties:
+                data:
+                  $ref: '#/definitions/passport.LoginResponse'
+              type: object
+        "400":
+          description: 参数有误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+      summary: 用户登录
+      tags:
+      - Passport
+  /passport/logout:
+    post:
+      consumes:
+      - application/json
+      description: 用户注销
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求成功
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "400":
+          description: 参数有误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+      summary: 用户注销
+      tags:
+      - Passport
+  /passport/mail/send:
+    post:
+      consumes:
+      - application/json
+      description: 根据类型发送电子邮箱验证码
+      parameters:
+      - description: 发送邮箱验证码请求
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/passport.EmailSendRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求成功
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "400":
+          description: 参数有误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+      summary: 发送电子邮箱验证码
+      tags:
+      - Passport
+  /passport/oauth2/provider:
+    get:
+      consumes:
+      - application/json
+      description: 列出oauth2第三方平台
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求成功
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "400":
+          description: 参数有误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+      summary: 列出oauth2第三方平台
+      tags:
+      - Passport
+    post:
+      consumes:
+      - application/json
+      description: 创建oauth2第三方平台
+      parameters:
+      - description: 创建oauth2第三方平台请求
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/passport.CreateOauth2ProviderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求成功
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "400":
+          description: 参数有误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+      summary: 创建oauth2第三方平台
+      tags:
+      - Passport
+  /passport/oauth2/provider/{provider}/delete:
+    post:
+      consumes:
+      - application/json
+      description: 删除oauth2第三方平台
+      parameters:
+      - description: 第三方平台
+        in: path
+        name: provider
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求成功
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "400":
+          description: 参数有误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+      summary: 删除oauth2第三方平台
+      tags:
+      - Passport
+  /passport/oauth2/provider/{provider}/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新oauth2第三方平台
+      parameters:
+      - description: 第三方平台
+        in: path
+        name: provider
+        required: true
+        type: string
+      - description: 更新oauth2第三方平台请求
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/passport.UpdateOauth2ProviderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求成功
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "400":
+          description: 参数有误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+      summary: 更新oauth2第三方平台
+      tags:
+      - Passport
+  /passport/oauth2/redirect/{provider}:
+    get:
+      consumes:
+      - application/json
+      description: 获取oauth2重定向url
+      parameters:
+      - description: 第三方平台
+        in: path
+        name: provider
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.RespBody'
+            - properties:
+                data:
+                  $ref: '#/definitions/passport.GetOauthRedirectURLResponse'
+              type: object
+        "400":
+          description: 参数有误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+      summary: 获取oauth2重定向url
+      tags:
+      - Passport
+  /passport/register:
+    post:
+      consumes:
+      - application/json
+      description: 根据类型用户注册
+      parameters:
+      - description: 用户注册请求
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/passport.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.RespBody'
+            - properties:
+                data:
+                  $ref: '#/definitions/passport.RegisterResponse'
+              type: object
+        "400":
+          description: 参数有误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+      summary: 用户注册
+      tags:
+      - Passport
+  /passport/session/refresh:
+    post:
+      consumes:
+      - application/json
+      description: 刷新会话，返回新的refresh_token并设置cookie
+      parameters:
+      - description: 刷新会话请求
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/passport.SessionRefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 请求成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/handler.RespBody'
+            - properties:
+                data:
+                  $ref: '#/definitions/passport.SessionRefreshResponse'
+              type: object
+        "400":
+          description: 参数有误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/handler.RespBody'
+      summary: 用户刷新会话
+      tags:
+      - Passport
+swagger: "2.0"
