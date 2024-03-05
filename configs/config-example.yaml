@@ -1,0 +1,31 @@
+server:
+  http:
+   addr: 0.0.0.0:9000
+   timeout: 10s
+data:
+  database:
+    driver: mysql
+    source: ""
+  redis:
+    addr: 127.0.0.1:6379
+    password: ""
+    read_timeout: 10s
+    write_timeout: 10s
+log:
+  console: true
+  level: info
+  caller: true
+smtp:
+  host: ""
+  port: 0
+  username: ""
+  password: ""
+  from_name: "noreply"
+passport: 
+  access_token_ttl: 3600s
+  refresh_token_ttl: 86400s
+  secret: "123456"
+captcha:
+  ttl: 300s
+  interval: 60s
+   
