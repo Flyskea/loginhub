@@ -65,6 +65,6 @@ func (r *APIV1Router) RegisterNoAuthV1APIRouter(g *gin.RouterGroup) {
 	{
 		oauth2V1 := g.Group("/oauth2")
 		oauth2V1.GET("/provider/supported", r.oauth2Handler.OAuth2SupportedProviders)
-		oauth2V1.POST("/redirect/:provider", r.oauth2Handler.OAuth2RequestURL)
+		oauth2V1.GET("/redirect/:provider", r.oauth2Handler.OAuth2RequestURL)
 	}
 }
